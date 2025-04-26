@@ -89,7 +89,7 @@ greet("Carla")
 
 4. Send the call:
 
-   - Place point on line 5
+   - Place point on line 4
    - `C-c C-l`
 
 5. Observe the output in the vterm buffer.
@@ -115,21 +115,27 @@ Here is the minor mode that wires everything up:
             map))
 ```
 
+For usage, it is enough to simple activate the keybindings with `vterm-python-mode`, or add the minor mode to a hook:
+
+```elisp
+(add-hook 'python-mode-hook 'vterm-python-mode)
+```
+
 ---
 
 ## Configuration
 
-By default, the mode reads:
+By default, the mode reads/respects:
 
 - `python-shell-interpreter` (e.g. `"python3"`)
 - `python-shell-interpreter-args` (e.g. `"-i"`)
 
 You can override these:
-
 ```elisp
 (setq python-shell-interpreter "python3.13"
       python-shell-interpreter-args "-i")
 ```
+... or simply customize these variables...
 
 ---
 
@@ -146,7 +152,7 @@ You can override these:
    `vterm-python-process-string`: Replaces sent `\n` with `C-q C-j` so the REPL treats multi-line input as one block.
 
 4. **Sending**
-   `vterm-python-send-string`: handles empty-line logic, optional extra return, and keeps state via `vterm-python-last-was-empty`.
+   `vterm-python-send-string`: handles empty-line logic, optional extra return to be sent to the vterm buffer, and keeps state via `vterm-python-last-was-empty`.
 
 5. **Convenience commands**
    `…-send-region`, `…-send-line`, `…-send-buffer`, `…-send-narrowed` wrap all of the above.
@@ -156,11 +162,11 @@ You can override these:
 ## Contributing
 
 1. Fork the repo.
-2. Clone it.
+2. Clone it locally.
 3. Create a branch: `git checkout -b feature/foo`.
 4. Commit your changes.
 5. Push: `git push origin feature/foo`.
-6. Open a Pull Request.
+6. Open a Pull Request through Github interface.
 
 ---
 
