@@ -4,8 +4,6 @@ Collection of functions to interact with a Python interpreter in vterm in Emacs.
 
 It is a tiny Emacs minor mode to send Python code (regions, lines, buffers, narrowed regions) to a `vterm`-based Python REPL, preserving your intended indentation and workflow.
 
----
-
 ## Features
 
 - **Open or switch** to a dedicated `*vterm-python*` buffer, reusing the last one or creating numbered new ones via prefix (`C-u`).
@@ -17,8 +15,6 @@ It is a tiny Emacs minor mode to send Python code (regions, lines, buffers, narr
 - **Correct block handling**: replaces newlines with `Ctrl+J` to treat multi-line input as a single block.
 - **Customizable**: honors `python-shell-interpreter` and `python-shell-interpreter-args`.
 - **Lightweight**: zero external dependencies beyond `vterm`.
-
----
 
 ## Installation
 
@@ -51,8 +47,6 @@ Or with `use-package`:
   :hook (python-mode . vterm-python-mode))
 ```
 
----
-
 ## Keybindings
 
 Once `vterm-python-mode` is active (lighter: `VtPy`), these bindings are available:
@@ -64,8 +58,6 @@ Once `vterm-python-mode` is active (lighter: `VtPy`), these bindings are availab
 | `C-c C-c` | `vterm-python-send-narrowed`   | Send the **narrowed region**                  |
 | `C-c C-l` | `vterm-python-send-line`       | Send the **current line** and move point down |
 | `C-c C-r` | `vterm-python-send-region`     | Send the **selected region**                  |
-
----
 
 ## Usage Example
 
@@ -96,8 +88,6 @@ greet("Carla")
 
 Also, the entire buffer can be sent with `C-c C-b` and the entire narrowed/visible region can be sent with `C-c C-c`.
 
----
-
 ## Minor Mode Code
 
 Here is the minor mode that wires everything up:
@@ -116,12 +106,9 @@ Here is the minor mode that wires everything up:
 ```
 
 For usage, it is enough to simple activate the keybindings with `vterm-python-mode`, or add the minor mode to a hook:
-
 ```elisp
 (add-hook 'python-mode-hook 'vterm-python-mode)
 ```
-
----
 
 ## Configuration
 
@@ -136,8 +123,6 @@ You can override these:
       python-shell-interpreter-args "-i")
 ```
 ... or simply customize these variables...
-
----
 
 ## How It Works
 
@@ -157,8 +142,6 @@ You can override these:
 5. **Convenience commands**
    `…-send-region`, `…-send-line`, `…-send-buffer`, `…-send-narrowed` wrap all of the above.
 
----
-
 ## Contributing
 
 1. Fork the repo.
@@ -167,8 +150,6 @@ You can override these:
 4. Commit your changes.
 5. Push: `git push origin feature/foo`.
 6. Open a Pull Request through Github interface.
-
----
 
 ## License
 
