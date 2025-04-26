@@ -4,6 +4,8 @@ Collection of functions to interact with a Python interpreter in vterm in Emacs.
 
 It is a tiny Emacs minor mode to send Python code (regions, lines, buffers, narrowed regions) to a `vterm`-based Python REPL, preserving your intended indentation and workflow.
 
+*Note:* This provided mode is Tramp-safe, i.e., it works through tramp as `vterm` does.
+
 ## Features
 
 - **Open or switch** to a dedicated `*vterm-python*` buffer, reusing the last one or creating numbered new ones via prefix (`C-u`).
