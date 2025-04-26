@@ -1,0 +1,139 @@
+;;; vterm-python.el --- Send code to a vterm Python REPL -*- lexical-binding: t; -*-
+
+;; Author: Pedro Ribeiro Mendes Júnior <pedrormjunior@gmail.com>
+;; Version: 0.1
+;; Package-Requires: ((emacs "26.1") (vterm "0.0"))
+;; Keywords: tools, terminals, python, repl
+;; URL: https://github.com/pedrormjunior/vterm-python
+
+;;; Commentary:
+
+;; This minor mode allows sending Python code (regions, lines,
+;; buffers, narrowed regions) to a vterm buffer running a Python
+;; interpreter, simulating an IPython-style REPL.
+
+;;; Code:
+
+(defvar vterm-python-last-was-empty
+  "Mark if last string (line) sent was empty.
+In case it was and the current sent string is empty, send a return to
+the terminal anyways." nil)
+
+(defun vterm-python-generate-buffer-name (&optional new)
+  "Get a buffer name for `*vterm-python*'.
+If NEW is non-nil, generate a new one, otherwise, try to reuse an
+already used one."
+  (let ((base-name "*vterm-python*")
+        (existing-buffers
+         (seq-filter (lambda (buf)
+                       (string-match-p
+                        "^\\*vterm-python\\*\\(<[0-9]+>\\)?$"
+                        (buffer-name buf)))
+                     (buffer-list))))
+    (if new
+        (generate-new-buffer-name base-name)
+      (if existing-buffers
+          (buffer-name (car existing-buffers))
+        base-name))))
+
+(defun vterm-python-open (prefix)
+  "Open or switch to the most recent Python vterm.
+With PREFIX argument, always open a new vterm buffer.  Without it, reuse
+the most recently used `*vterm-python*' buffer.  Start the interpreter
+only if the buffer is newly created."
+  (interactive "P")
+  (let* ((interpreter (or python-shell-interpreter "python3"))
+         (args (or python-shell-interpreter-args ""))
+         (cmd (string-trim (concat interpreter " " args "; exit")))
+         (buf-name (vterm-python-generate-buffer-name prefix))
+         (new-buffer? (not (get-buffer buf-name)))
+         (window-config (current-window-configuration)))
+    (if new-buffer?
+        (progn
+          (vterm buf-name)
+          (vterm-clear)
+          (vterm-send-string cmd)
+          (vterm-send-return)
+          (set-window-configuration window-config)))
+    (switch-to-buffer-other-window buf-name)))
+
+(defun vterm-python-process-string (str)
+  "Common processing of strings STR for `*vterm-python*'."
+  (replace-regexp-in-string
+   "\n" "\C-q\C-j"
+   (replace-regexp-in-string "\n\\'" "" str)))
+
+(defun vterm-python-send-string (buf-name str &optional extra-return)
+  "Send string STR to `*vterm-python*' buffer.
+BUF-NAME is the name of the buffer in which to send the string STR."
+  (if (get-buffer buf-name)
+      (progn
+        (with-current-buffer buf-name
+          (vterm-send-string str)
+          (if (or (not (string= str ""))
+                  vterm-python-last-was-empty)
+              (progn
+                (vterm-send-return)
+                (when extra-return
+                  (vterm-send-return))
+                (vterm-send-key "\\" nil t)
+                (setq vterm-python-last-was-empty nil))
+            (vterm-send-key "q" nil nil t)
+            (vterm-send-key "j" nil nil t)
+            (setq vterm-python-last-was-empty t)))
+        (deactivate-mark))
+    (error "No vterm-python buffer found")))
+
+(defun vterm-python-send-region nil
+  "Send the selected region to `*vterm-python*' buffer."
+  (interactive)
+  (if (use-region-p)
+      (let* ((region (buffer-substring-no-properties
+                      (region-beginning) (region-end)))
+             (processed-str (vterm-python-process-string region))
+             (existing-buffers (vterm-python-existing-buffers))
+             (buf-name (vterm-python-generate-buffer-name)))
+        (vterm-python-send-string buf-name processed-str))
+    (error "No region selected")))
+
+(defun vterm-python-send-line ()
+  "Send the current line to `*vterm-python*' buffer."
+  (interactive)
+  (let* ((line (thing-at-point 'line t))  ;; Get the current line
+         (processed-str (vterm-python-process-string line))
+         (existing-buffers (vterm-python-existing-buffers))
+         (buf-name (vterm-python-generate-buffer-name)))
+    (vterm-python-send-string buf-name processed-str)
+    (next-line)))
+
+(defun vterm-python-send-buffer ()
+  "Send the entire buffer to `*vterm-python*' buffer."
+  (interactive)
+  (let* ((buffer-content (buffer-string))
+         (processed-str (vterm-python-process-string buffer-content))
+         (buf-name (vterm-python-generate-buffer-name)))
+    (vterm-python-send-string buf-name processed-str t)))
+
+(defun vterm-python-send-narrowed ()
+  "Send the narrowed region to `*vterm-python*' buffer."
+  (interactive)
+  (let* ((narrowed-region (buffer-substring-no-properties
+                           (point-min) (point-max)))
+         (processed-str (vterm-python-process-string narrowed-region))
+         (buf-name (vterm-python-generate-buffer-name)))
+    (vterm-python-send-string buf-name processed-str t)))
+
+(define-minor-mode vterm-python-mode
+  "Minor mode for sending code to `*vterm-python*'."
+  :lighter " VtPy"
+  :keymap (let ((map (make-sparse-keymap)))
+            (define-key map (kbd "C-c C-o") #'vterm-python-open)
+            (define-key map (kbd "C-c C-b") #'vterm-python-send-buffer)
+            (define-key map (kbd "C-c C-c") #'vterm-python-send-narrowed)
+            (define-key map (kbd "C-c C-l") #'vterm-python-send-line)
+            (define-key map (kbd "C-c C-r") #'vterm-python-send-region)
+            map))
+
+(provide 'vterm-python)
+
+;;; vterm-python.el ends here
