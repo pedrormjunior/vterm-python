@@ -112,6 +112,15 @@ only if the buffer is newly created."
     (forward-line)))
 
 ;;;###autoload
+(defun vterm-python-send-region-or-line nil
+  "Send the selected region or line to `*vterm-python*' buffer.
+When there is no selected region, the current line is sent instead."
+  (interactive)
+  (if (use-region-p)
+      (vterm-python-send-region)
+    (vterm-python-send-line)))
+
+;;;###autoload
 (defun vterm-python-send-buffer nil
   "Send the entire buffer to `*vterm-python*' buffer."
   (interactive)
@@ -136,10 +145,11 @@ only if the buffer is newly created."
   "Minor mode for sending code to `*vterm-python*' buffer."
   :lighter " VtPy"
   :keymap (let ((map (make-sparse-keymap)))
-            (define-key map (kbd "C-c C-o") #'vterm-python-open)
             (define-key map (kbd "C-c C-b") #'vterm-python-send-buffer)
-            (define-key map (kbd "C-c C-c") #'vterm-python-send-narrowed)
+            (define-key map (kbd "C-c C-c") #'vterm-python-send-region-or-line)
             (define-key map (kbd "C-c C-l") #'vterm-python-send-line)
+            (define-key map (kbd "C-c C-n") #'vterm-python-send-narrowed)
+            (define-key map (kbd "C-c C-o") #'vterm-python-open)
             (define-key map (kbd "C-c C-r") #'vterm-python-send-region)
             map))
 
