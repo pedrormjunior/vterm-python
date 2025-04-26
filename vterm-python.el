@@ -1,10 +1,12 @@
-;;; vterm-python.el --- Send code to a vterm Python REPL -*- lexical-binding: t; -*-
+;;; vterm-python.el --- Send code to Python vterm easily -*- lexical-binding: t; -*-
 
 ;; Author: Pedro Ribeiro Mendes Júnior <pedrormjunior@gmail.com>
+;; Maintainer: Pedro Ribeiro Mendes Júnior <pedrormjunior@gmail.com>
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "26.1") (vterm "0.0"))
-;; Keywords: tools, terminals, python, repl
-;; URL: https://github.com/pedrormjunior/vterm-python
+;; Homepage: https://github.com/pedrormjunior/vterm-python
+;; Keywords: terminals, python, repl, convenience
+;; License: GPL-3+
 
 ;;; Commentary:
 
@@ -65,6 +67,7 @@ BUF-NAME is the name of the buffer in which to send the string STR."
     (error "No vterm-python buffer found")))
 
 
+;;;###autoload
 (defun vterm-python-open (prefix)
   "Open or switch to the most recent Python vterm.
 With PREFIX argument, always open a new vterm buffer.  Without it, reuse
@@ -86,6 +89,7 @@ only if the buffer is newly created."
           (set-window-configuration window-config)))
     (switch-to-buffer-other-window buf-name)))
 
+;;;###autoload
 (defun vterm-python-send-region nil
   "Send the selected region to `*vterm-python*' buffer."
   (interactive)
@@ -97,6 +101,7 @@ only if the buffer is newly created."
         (vterm-python-send-string buf-name processed-str))
     (error "No region selected")))
 
+;;;###autoload
 (defun vterm-python-send-line nil
   "Send the current line to `*vterm-python*' buffer."
   (interactive)
@@ -106,6 +111,7 @@ only if the buffer is newly created."
     (vterm-python-send-string buf-name processed-str)
     (forward-line)))
 
+;;;###autoload
 (defun vterm-python-send-buffer nil
   "Send the entire buffer to `*vterm-python*' buffer."
   (interactive)
@@ -114,6 +120,7 @@ only if the buffer is newly created."
          (buf-name (vterm-python-generate-buffer-name)))
     (vterm-python-send-string buf-name processed-str t)))
 
+;;;###autoload
 (defun vterm-python-send-narrowed nil
   "Send the narrowed region to `*vterm-python*' buffer."
   (interactive)
@@ -124,6 +131,7 @@ only if the buffer is newly created."
     (vterm-python-send-string buf-name processed-str t)))
 
 
+;;;###autoload
 (define-minor-mode vterm-python-mode
   "Minor mode for sending code to `*vterm-python*' buffer."
   :lighter " VtPy"
