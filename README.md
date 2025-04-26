@@ -21,7 +21,7 @@ It is a tiny Emacs minor mode to send Python code (regions, lines, buffers, narr
 ### 1. Clone or download
 
 ```bash
-git clone https://github.com/yourusername/vterm-python.git ~/.emacs.d/site-lisp/vterm-python
+git clone https://github.com/pedrormjunior/vterm-python.git ~/.emacs.d/site-lisp/vterm-python
 ```
 
 ### 2. Add to your `load-path`
